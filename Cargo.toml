@@ -1,0 +1,28 @@
+[package]
+name = "tauri-plugin-unarchiver"
+version = "0.0.0"
+authors = [ "DaOfficialWizard" ]
+description = "A lightweight archive extraction utility."
+edition = "2021"
+rust-version = "1.64"
+exclude = ["/examples"]
+
+[dependencies]
+tauri = { version = "1.3.0" }
+tauri-build = "1"
+zip-extract = "0.1.2"
+log = "^0.4.18"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+
+[profile]
+[profile.dev]
+debug = 0
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

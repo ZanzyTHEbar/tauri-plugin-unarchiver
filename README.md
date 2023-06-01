@@ -1,6 +1,6 @@
 <!-- ![tauri-plugin-unarchiver](banner.png) -->
 
-# Tauri Plugin Unarchiver
+# Tauri Plugin UnArchiver
 
 A lightweight archive extraction utility.
 
@@ -20,7 +20,7 @@ Install the Core plugin by adding the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-tauri-plugin-unarchiver = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "main" }
+tauri-plugin-unarchiver = { git = "https://github.com/ZanzyTHEbar/tauri-plugin-unarchiver", branch = "main" }
 ```
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
@@ -28,11 +28,11 @@ You can install the JavaScript Guest bindings using your preferred JavaScript pa
 > Note: Since most JavaScript package managers are unable to install packages from git monorepos we provide read-only mirrors of each plugin. This makes installation option 2 more ergonomic to use.
 
 ```sh
-pnpm add https://github.com/tauri-apps/tauri-plugin-unarchiver
+pnpm add https://github.com/ZanzyTHEbar/tauri-plugin-unarchiver
 # or
-npm add https://github.com/tauri-apps/tauri-plugin-unarchiver
+npm add https://github.com/ZanzyTHEbar/tauri-plugin-unarchiver
 # or
-yarn add https://github.com/tauri-apps/tauri-plugin-unarchiver
+yarn add https://github.com/ZanzyTHEbar/tauri-plugin-unarchiver
 ```
 
 ## Usage

@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 export async function unarchive(
   archivePath: string,
-  targetDir: string
+  targetDir?: string
 ): Promise<string> {
   return await invoke("plugin:unarchiver|unarchive", {
     archivePath,

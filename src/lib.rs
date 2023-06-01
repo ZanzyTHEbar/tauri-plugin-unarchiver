@@ -41,18 +41,20 @@ async fn exists(path: PathBuf) -> bool {
 #[command]
 async fn unarchive(
     archive_path: PathBuf,
-    mut target_dir: PathBuf,
+    target_dir: Option<PathBuf>,
     erase_when_done: bool,
 ) -> Result<String> {
     // check in the target directory is passed in
-    if target_dir.to_str().unwrap().is_empty() {
-        // get the parent directory of the archive
-        warn!("No target directory passed in, using parent directory of archive");
-        target_dir = archive_path
-            .parent()
-            .expect("Failed to get parent directory of archive")
-            .to_path_buf();
-    }
+    let target_dir = match target_dir {
+        Some(dir) => dir,
+        None => {
+            warn!("No target directory passed in, using parent directory of archive");
+            archive_path
+                .parent()
+                .expect("Failed to get parent directory of archive")
+                .to_path_buf()
+        }
+    };
 
     // check if the target directory was passed in
     if !target_dir.exists() {

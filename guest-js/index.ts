@@ -2,11 +2,13 @@ import { invoke } from "@tauri-apps/api/tauri";
 
 export async function unarchive(
   archivePath: string,
-  targetDir?: string
+  targetDir?: string,
+  eraseWhenDone?: boolean
 ): Promise<string> {
   return await invoke("plugin:unarchiver|unarchive", {
     archivePath,
     targetDir,
+    eraseWhenDone,
   });
 }
 

@@ -42,8 +42,11 @@ async fn exists(path: PathBuf) -> bool {
 async fn unarchive(
     archive_path: PathBuf,
     target_dir: Option<PathBuf>,
-    erase_when_done: bool,
+    erase_when_done: Option<bool>,
 ) -> Result<String> {
+
+    let erase_when_done = erase_when_done.unwrap_or(false);
+    
     // check in the target directory is passed in
     let target_dir = match target_dir {
         Some(dir) => dir,

@@ -6,6 +6,7 @@ use tauri::{
     plugin::{Builder as PluginBuilder, TauriPlugin},
     Runtime,
 };
+use zip_extract::ZipExtractError;
 
 use std::path::PathBuf;
 
@@ -23,6 +24,12 @@ impl Serialize for Error {
         S: Serializer,
     {
         serializer.serialize_str(self.to_string().as_ref())
+    }
+}
+
+impl From<ZipExtractError> for Error {
+    fn from(e: ZipExtractError) -> Self {
+        Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e))
     }
 }
 
@@ -44,9 +51,8 @@ async fn unarchive(
     target_dir: Option<PathBuf>,
     erase_when_done: Option<bool>,
 ) -> Result<String> {
-
     let erase_when_done = erase_when_done.unwrap_or(false);
-    
+
     // check in the target directory is passed in
     let target_dir = match target_dir {
         Some(dir) => dir,
@@ -77,13 +83,12 @@ async fn unarchive(
 
     // The third parameter allows you to strip away toplevel directories.
     // If `archive` contained a single directory, its contents would be extracted instead.
-    let archive = std::fs::read(&archive_path).expect("Failed to read archive");
-    zip_extract::extract(std::io::Cursor::new(archive), &target_dir, true)
-        .expect("Failed to extract archive");
+    let archive = std::fs::read(&archive_path)?;
+    zip_extract::extract(std::io::Cursor::new(archive), &target_dir, true)?;
 
     // erase the archive if the flag is set
     if erase_when_done {
-        std::fs::remove_file(&archive_path).expect("Failed to remove archive");
+        std::fs::remove_file(&archive_path)?;
     }
     Ok("Archive extracted successfully".to_string())
 }

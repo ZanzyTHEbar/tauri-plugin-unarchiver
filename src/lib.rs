@@ -1,14 +1,14 @@
 use log::warn;
 use serde::{ser::Serializer, Serialize};
 
+use std::path::PathBuf;
+use tar::Archive;
 use tauri::{
     command,
     plugin::{Builder as PluginBuilder, TauriPlugin},
     Runtime,
 };
 use zip_extract::ZipExtractError;
-
-use std::path::PathBuf;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -81,15 +81,57 @@ async fn unarchive(
         )));
     }
 
-    // The third parameter allows you to strip away toplevel directories.
-    // If `archive` contained a single directory, its contents would be extracted instead.
-    let archive = std::fs::read(&archive_path)?;
-    zip_extract::extract(std::io::Cursor::new(archive), &target_dir, true)?;
+    let archive_path_str = match archive_path.to_str() {
+        Some(path) => path,
+        None => {
+            return Err(Error::Io(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "Archive path is not valid UTF-8",
+            )))
+        }
+    };
+
+    // split the archive path to get the extension
+    let archive_path_split: Vec<&str> = archive_path_str.split('.').collect();
+
+    match archive_path_split.last() {
+        Some(ext) => {
+            match *ext {
+                "zip" => {
+                    // extract the archive
+                    // The third parameter allows you to strip away toplevel directories.
+                    // If `archive` contained a single directory, its contents would be extracted instead.
+                    let archive = std::fs::read(&archive_path)?;
+                    zip_extract::extract(std::io::Cursor::new(archive), &target_dir, true)?;
+                }
+                "tar" | "gz" | "tar.gz" => {
+                    // extract the archive
+                    let archive = std::fs::File::open(&archive_path)?;
+                    let mut archive = Archive::new(archive);
+                    archive.unpack(&target_dir)?;
+                }
+                "rar" => {}
+                _ => {
+                    return Err(Error::Io(std::io::Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        "Archive is not a supported type",
+                    )));
+                }
+            }
+        }
+        None => {
+            return Err(Error::Io(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "File is not an archive",
+            )));
+        }
+    }
 
     // erase the archive if the flag is set
     if erase_when_done {
         std::fs::remove_file(&archive_path)?;
     }
+
     Ok("Archive extracted successfully".to_string())
 }
 

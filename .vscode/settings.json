@@ -6,6 +6,7 @@
     "onwarn",
     "rdev",
     "thiserror",
-    "unarchiver"
+    "unarchiver",
+    "unrar"
   ]
 }

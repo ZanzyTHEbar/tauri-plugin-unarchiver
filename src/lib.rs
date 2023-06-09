@@ -1,8 +1,10 @@
+extern crate unrar;
+
 use log::warn;
 use serde::{ser::Serializer, Serialize};
+use unrar::Archive;
 
 use std::path::PathBuf;
-use tar::Archive;
 use tauri::{
     command,
     plugin::{Builder as PluginBuilder, TauriPlugin},
@@ -107,10 +109,39 @@ async fn unarchive(
                 "tar" | "gz" | "tar.gz" => {
                     // extract the archive
                     let archive = std::fs::File::open(&archive_path)?;
-                    let mut archive = Archive::new(archive);
+                    let mut archive = tar::Archive::new(archive);
                     archive.unpack(&target_dir)?;
                 }
-                "rar" => {}
+                "rar" => {
+                    // convert the path to a string
+                    let archive_path = match archive_path.to_str() {
+                        Some(path) => path,
+                        None => {
+                            return Err(Error::Io(std::io::Error::new(
+                                std::io::ErrorKind::InvalidInput,
+                                "Archive path is not valid UTF-8",
+                            )))
+                        }
+                    };
+
+                    let target_dir = match target_dir.to_str() {
+                        Some(path) => path,
+                        None => {
+                            return Err(Error::Io(std::io::Error::new(
+                                std::io::ErrorKind::InvalidInput,
+                                "Target directory path is not valid UTF-8",
+                            )))
+                        }
+                    };
+
+                    // extract the archive
+                    // Need to refactor this to remove unwrap
+                    Archive::new(archive_path.to_string())
+                        .extract_to(target_dir.to_string())
+                        .unwrap()
+                        .process()
+                        .expect("Failed to extract archive");
+                }
                 _ => {
                     return Err(Error::Io(std::io::Error::new(
                         std::io::ErrorKind::InvalidInput,

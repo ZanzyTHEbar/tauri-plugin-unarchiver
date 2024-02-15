@@ -25,7 +25,7 @@ tauri-plugin-unarchiver = { git = "https://github.com/ZanzyTHEbar/tauri-plugin-u
 
 You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
 
-> [!NOTE]\ 
+> [!NOTE] 
 > Since most JavaScript package managers are unable to install packages from git monorepos we provide read-only mirrors of each plugin. This makes installation option 2 more ergonomic to use.
 
 ```sh
